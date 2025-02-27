@@ -4,6 +4,8 @@ import twilio from "twilio";
 import fetch from "node-fetch"; // For making API calls to GPT
 import dotenv from "dotenv";
 
+dotenv.config();
+
 const app = express();
 const PORT = 3000;
 
@@ -20,6 +22,9 @@ const db = new Pool({
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
+  ssl: {
+    rejectUnauthorized: false, // Set to true if your database requires a verified certificate
+  },
 });
 
 db.connect();
