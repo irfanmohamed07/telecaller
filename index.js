@@ -52,7 +52,7 @@ app.post("/submit-issue", async (req, res) => {
     await client.calls.create({
       to: phone,
       from: "+17755228853",
-      url: "http://telecaller.onrender.com/voice-response",
+      url: "https://telecaller-05uy.onrender.com/voice-response",
     });
 
     res.send("Issue reported successfully, and we have initiated a call.");
