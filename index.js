@@ -75,39 +75,36 @@ app.post("/voice-response", (req, res) => {
   `);
 });
 
-// Process User Speech and Generate AI Response
 app.post("/process-response", async (req, res) => {
   const userResponse = req.body.SpeechResult || "";
 
   try {
-    // Send user response to OpenAI or any AI model for a dynamic reply
-    const gptResponse = await fetch(
-      "https://api.openai.com/v1/engines/text-davinci-003/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer your_openai_api_key`,
-        },
-        body: JSON.stringify({
-          prompt: `User said: "${userResponse}". Respond as a customer support representative for a product issue.`,
-          max_tokens: 100,
-        }),
+    // Execute Python script to process the user response
+    exec(
+      `python3 ./nlp_script.py "${userResponse}"`,
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error(`exec error: ${error}`);
+          return res.type("text/xml").send(`
+          <Response>
+            <Say>Sorry, we encountered an error processing your response.</Say>
+          </Response>
+        `);
+        }
+
+        const aiReply = stdout.trim();
+
+        res.type("text/xml");
+        res.send(`
+        <Response>
+          <Say>${aiReply}</Say>
+          <Gather input="speech" action="/process-response" timeout="10">
+            <Say>Is there anything else I can assist you with?</Say>
+          </Gather>
+        </Response>
+      `);
       }
     );
-
-    const gptData = await gptResponse.json();
-    const aiReply = gptData.choices[0].text.trim();
-
-    res.type("text/xml");
-    res.send(`
-      <Response>
-        <Say>${aiReply}</Say>
-        <Gather input="speech" action="/process-response" timeout="10">
-          <Say>Is there anything else I can assist you with?</Say>
-        </Gather>
-      </Response>
-    `);
   } catch (error) {
     console.error("Error processing response:", error);
     res.type("text/xml");
