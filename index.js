@@ -1,6 +1,7 @@
 import express from "express";
 import pkg from "pg";
 import twilio from "twilio";
+import { exec } from "child_process";
 import fetch from "node-fetch"; // For making API calls to GPT
 import dotenv from "dotenv";
 
