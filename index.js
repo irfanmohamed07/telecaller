@@ -44,10 +44,7 @@ app.post("/submit-issue", async (req, res) => {
   const { name, phone, product, issue } = req.body;
 
   try {
-    await db.query(
-      "INSERT INTO product_issues (name, phone, product, issue) VALUES ($1, $2, $3, $4)",
-      [name, phone, product, issue]
-    );
+    
 
     // Initiate a call to the user
     await client.calls.create({
